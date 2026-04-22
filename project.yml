@@ -1,0 +1,62 @@
+name: wrec
+options:
+  bundleIdPrefix: com.srijan
+  deploymentTarget:
+    macOS: "15.0"
+  xcodeVersion: "26.1"
+  generateEmptyDirectories: true
+  createIntermediateGroups: true
+
+packages:
+  speech-swift:
+    url: https://github.com/soniqo/speech-swift
+    branch: main
+
+targets:
+  wrec:
+    type: application
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: wrec
+        excludes:
+          - "**/.build"
+          - "**/Packages"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.srijan.wrec
+        SWIFT_VERSION: "6.0"
+        MACOSX_DEPLOYMENT_TARGET: "26.0"
+        DEVELOPMENT_TEAM: S388F7HJXT
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_APP_SANDBOX: YES
+        ENABLE_HARDENED_RUNTIME: YES
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY: YES
+    dependencies:
+      - package: speech-swift
+        product: ParakeetASR
+      - package: speech-swift
+        product: SpeechVAD
+      - package: speech-swift
+        product: AudioCommon
+
+  wrecTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: wrecTests
+    dependencies:
+      - target: wrec
+
+  wrecUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: wrecUITests
+    dependencies:
+      - target: wrec
