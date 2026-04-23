@@ -124,11 +124,27 @@ struct TranscribeTool {
         print("Loading Parakeet ASR model...")
         let model = try await ParakeetASRModel.fromPretrained()
 
-        print("Transcribing...\n")
+        // Chunk audio into ~30 second segments (480,000 samples at 16kHz)
+        let chunkSize = 480000
+        let totalChunks = (samples.count + chunkSize - 1) / chunkSize
 
-        let result = model.transcribe(audio: samples, sampleRate: 16000, language: nil)
+        print("Transcribing \(samples.count) samples in \(totalChunks) chunks...\n")
 
-        return result
+        var fullTranscript = ""
+
+        for i in 0..<totalChunks {
+            let start = i * chunkSize
+            let end = min(start + chunkSize, samples.count)
+            let chunk = Array(samples[start..<end])
+
+            let chunkDuration = Double(chunk.count) / 16000.0
+            print("  Chunk \(i+1)/\(totalChunks): \(String(format: "%.1f", chunkDuration))s")
+
+            let result = model.transcribe(audio: chunk, sampleRate: 16000, language: nil)
+            fullTranscript += result + " "
+        }
+
+        return fullTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
